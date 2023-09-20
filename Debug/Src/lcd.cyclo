@@ -1,0 +1,7 @@
+../Src/lcd.c:7:6:lcd_transmit_byte	3
+../Src/lcd.c:15:6:lcd_push_buffer	5
+../Src/lcd.c:64:6:lcd_reset	3
+../Src/lcd.c:95:6:init_spi_lcd	1
+../Src/lcd.c:164:6:generate_line_buff	3
+../Src/lcd.c:181:6:write_line_buff	3
+../Src/lcd.c:199:6:lcd_write_string	1

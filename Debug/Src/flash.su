@@ -1,0 +1,7 @@
+../Src/flash.c:7:6:init_page_flash	16	static
+../Src/flash.c:14:10:read_hword_flash	16	static
+../Src/flash.c:18:10:read_word_flash	16	static
+../Src/flash.c:22:7:read_float_flash	16	static
+../Src/flash.c:26:6:write_hword_flash	16	static
+../Src/flash.c:32:6:write_word_flash	24	static
+../Src/flash.c:38:6:write_float_flash	24	static
