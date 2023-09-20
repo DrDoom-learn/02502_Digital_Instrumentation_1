@@ -60,8 +60,8 @@ all: main-build
 main-build: Assignment\ 2.elf secondary-outputs
 
 # Tool invocations
-Assignment\ 2.elf Assignment\ 2.map: $(OBJS) $(USER_OBJS) C:/Users/mathi/git/02502_Digital_Instrumentation_1/Digital_Instrumentation_E1/STM32F302R8TX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "Assignment 2.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:/Users/mathi/git/02502_Digital_Instrumentation_1/Digital_Instrumentation_E1/STM32F302R8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Assignment 2.map" -Wl,--gc-sections -static -u _printf_float --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Assignment\ 2.elf Assignment\ 2.map: $(OBJS) $(USER_OBJS) C:/Users/mathi/git/02502_Digital_Instrumentation_1/02502_Digital_Instrumentation_1/STM32F302R8TX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "Assignment 2.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:/Users/mathi/git/02502_Digital_Instrumentation_1/02502_Digital_Instrumentation_1/STM32F302R8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Assignment 2.map" -Wl,--gc-sections -static -u _printf_float --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

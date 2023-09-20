@@ -19,6 +19,7 @@ typedef struct {
     uint8_t hundredths;
 } stopwatch_time;
 
+extern float VDDA;
 
 //ADC VREF_CAL
 #define VREFINT_CAL *((uint16_t*) ((uint32_t) 0x1FFFF7BA)) //calibrated at 3.3V@ 30C
@@ -27,7 +28,7 @@ typedef struct {
 #define TRUE 1
 #define FALSE !TRUE
 
-extern float VDDA;
+
 
 
 // ADC functions

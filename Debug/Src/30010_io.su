@@ -1,4 +1,4 @@
-C:/Users/mathi/git/02502_Digital_Instrumentation_1/Digital_Instrumentation_E1/cmsis/core_cm4.h:1071:22:NVIC_EnableIRQ	16	static
+C:/Users/mathi/git/02502_Digital_Instrumentation_1/02502_Digital_Instrumentation_1/cmsis/core_cm4.h:1071:22:NVIC_EnableIRQ	16	static
 ../Src/30010_io.c:11:9:uart_get_char	16	static
 ../Src/30010_io.c:20:6:uart_put_char	16	static
 ../Src/30010_io.c:25:5:_write_r	32	static

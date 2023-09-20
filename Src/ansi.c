@@ -3,11 +3,8 @@
 #include "ansi.h"
 
 
-const uint8_t LED_DELAY_MAX = 10;
-uint8_t LED_COUNTER = 0;
-
-const uint8_t LCD_DELAY_MAX = 100;
-uint8_t LCD_COUNTER = 0;
+const uint8_t LED_DELAY_MAX = 10, LCD_DELAY_MAX = 100;
+uint8_t LED_COUNTER = 0, LCD_COUNTER = 0;
 
 bool LCD_flag = FALSE;
 
@@ -15,8 +12,8 @@ float VDDA;
 
 uint16_t ADC_measure_PA(uint8_t ch) {
 	ADC_RegularChannelConfig(ADC1, ch, 1, ADC_SampleTime_1Cycles5);
-	ADC_StartConversion(ADC1); // Start ADC read
-	while (ADC_GetFlagStatus(ADC1, ADC_FLAG_EOC) == 0) {} // Wait for ADC read
+	ADC_StartConversion(ADC1); 	/* Start ADC read */
+	while (ADC_GetFlagStatus(ADC1, ADC_FLAG_EOC) == 0) {} /* Wait for ADC read */
 	uint16_t x = ADC_GetConversionValue(ADC1); // Read the ADC value into a variable
 
 	return x;
@@ -225,24 +222,25 @@ void setup_TIM15(void){
 
 void TIM1_BRK_TIM15_IRQHandler(void) {
 	//TODO sæt et flag her og gør ting i main.c
+
 	__disable_irq();
 
 	uint16_t x = ADC_measure_PA(1);
 	uint16_t y = ADC_measure_PA(2);
-	char str_test[512] = { 0 };
-	uint8_t printout[512] = { 0 };
+
+	uint8_t printout[512] = {0};
+
+	char str_test[512] = {0};
+
 	if (++LCD_COUNTER == LCD_DELAY_MAX) {
-		__disable_irq();
 
-		float VCH1 = (VDDA/4095)*x;
-		float VCH2 = (VDDA/4095)*y;
-
+		float VCH1 = (VDDA / 4095) * x;
+		float VCH2 = (VDDA / 4095) * y;
 
 		//TODO lav en funktion til at samle nedenstående
 		sprintf(str_test, "VCH1 = %.2f", VCH1);
 		lcd_write_string(str_test, printout, 1, 1);
 		lcd_push_buffer(printout);
-
 
 		sprintf(str_test, "VCH2 = %.2f", VCH2);
 		lcd_write_string(str_test, printout, 1, 2);
@@ -254,16 +252,18 @@ void TIM1_BRK_TIM15_IRQHandler(void) {
 
 
 
-//	printf("%d\n",__LINE__);
-//
-//	if (++LCD_COUNTER == LCD_DELAY_MAX) {
-//		printf("*******\n%d***********\n",__LINE__);
-//		LCD_flag = TRUE;
-//		LCD_COUNTER = RESET;
-//	}
+/*	printf("%d\n",__LINE__);
 
-// Joystick input
-/*	if (TIM_GetITStatus(TIM15, TIM_IT_Update) != RESET) {
+	if (++LCD_COUNTER == LCD_DELAY_MAX) {
+		printf("*******\n%d***********\n",__LINE__);
+		LCD_flag = TRUE;
+		LCD_COUNTER = RESET;
+	}
+*/
+/*	Joystick input
+	if (TIM_GetITStatus(TIM15, TIM_IT_Update) != RESET) {
+
+		LED_COUNTER = 0;
 
 		// up
 		if (GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_4)) {
@@ -281,7 +281,8 @@ void TIM1_BRK_TIM15_IRQHandler(void) {
 		}
 
 		// up_left
-		if (GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_1) && GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_4)) {
+		if (GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_1)
+				&& GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_4)) {
 			set_LED(cyan);
 		}
 
@@ -291,7 +292,8 @@ void TIM1_BRK_TIM15_IRQHandler(void) {
 		}
 
 		// up_right
-		if (GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_0) && GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_4)) {
+		if (GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_0)
+				&& GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_4)) {
 			set_LED(yellow);
 		}
 
@@ -306,7 +308,8 @@ void TIM1_BRK_TIM15_IRQHandler(void) {
 		}
 
 		TIM_ClearITPendingBit(TIM15, TIM_IT_Update);
-	} */
+	}
+*/
 
 	__enable_irq();
 }
