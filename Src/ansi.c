@@ -246,8 +246,8 @@ void TIM1_BRK_TIM15_IRQHandler(void) {
 		lcd_write_string(str_test, printout, 1, 2);
 		lcd_push_buffer(printout);
 		LCD_flag = FALSE;
-		__enable_irq();
 		LCD_COUNTER = RESET;
+		__enable_irq();
 	}
 
 
@@ -260,6 +260,8 @@ void TIM1_BRK_TIM15_IRQHandler(void) {
 		LCD_COUNTER = RESET;
 	}
 */
+
+
 /*	Joystick input
 	if (TIM_GetITStatus(TIM15, TIM_IT_Update) != RESET) {
 
