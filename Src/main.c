@@ -3,12 +3,21 @@
 #include "lcd.h"			// LCD library
 #include "ansi.h"			// homebrew
 #include "flash.h"
+#include <string.h>
+
 
 volatile static uint8_t result = 0;
 volatile static uint8_t __DEBUG__ = 0;
 
+
+/* VARIABLES FOR STOPWATCH FUNCTION */
 volatile stopwatch_time sw_time;
 volatile stopwatch_time sw_split;
+uint8_t last_second = 0;
+char str[128] = {0};
+char str2[128] = {0};
+/* VARIABLES FOR STOPWATCH FUNCTION */
+
 
 extern bool LCD_flag;
 
@@ -21,11 +30,12 @@ void init(void) {
 	//initJoystick();
 	//initLed();
 	//setLed(off);
-	//init_Interrupt();
-	setup_TIM15();
+	init_Interrupt();
+	//init_TIM2();
+	//setup_TIM15();
 	init_spi_lcd();
-	ADC_setup_PA();
-	ADC_CAL();
+	//ADC_setup_PA();
+	//ADC_CAL();
 	__enable_irq();	//Enable global interrupts.
 }
 
@@ -33,19 +43,28 @@ void init(void) {
 int main(void) {
 
 	init();
-
+TIM_Cmd(TIM2, ENABLE);
 
 	while (1) {
 
+
+/* STOPWATCH EXERCISE  Exercise 1.4   */
+//		sprintf(str2, "Time since start: %02d %02d %02d\n Split time 1: %02d %02d %02d \n  ", sw_time.hours, sw_time.minutes, sw_time.seconds, sw_split.hours, sw_split.minutes, sw_split.seconds);
+//				if (sw_time.seconds != last_second) {
+//					printf(str2);
+//					last_second = sw_time.seconds;
+//				}
+
+/* OPG 2.1  */
+				uint8_t fbuffer[512];
+				memset(fbuffer,0x0A,512); // Sets each element of the buffer to 0xAA
+			    //uint8_t fbuffer[512] = {0x7F, 0x31, 0x34, 0x3C, 0x34, 0x30, 0x78, 0x00};
+			    lcd_push_buffer(fbuffer);
 	}
 
 
 
-//        OPG 2.1
-//		uint8_t fbuffer[512];
-//		memset(fbuffer,0xAA,512); // Sets each element of the buffer to 0xAA
-//	    //uint8_t fbuffer[512] = {0x7F, 0x31, 0x34, 0x3C, 0x34, 0x30, 0x78, 0x00};
-//	    lcd_push_buffer(fbuffer);
+
 
 	//        OPG 2.2
 
@@ -62,7 +81,6 @@ int main(void) {
 //	    sprintf(str_test, "a = %2d", a);
 //	    lcd_write_string(str_test, printout, 50, 1);
 //	    lcd_push_buffer(printout);
-
 
 
 	//TODO Lav nedenstående til funktioner

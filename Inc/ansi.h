@@ -30,6 +30,11 @@ extern float VDDA;
 
 
 
+// PWM function
+void GPIO_set_AF1_PA6(void);
+void TIM16_PWM_init(uint8_t duty);
+
+
 
 // ADC functions
 void ADC_setup_PA(void);
@@ -41,7 +46,7 @@ void init_Joystick(void);
 void print_byte(uint8_t input);
 void init_LED(void);
 void set_LED(LED_Color color);
-void setup_TIM2(void);
+void init_TIM2(void);
 void setupTIM2PWM(void);
 void setup_TIM15(void);
 void GPIO_set_AF_PA5(void);

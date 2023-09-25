@@ -10,6 +10,65 @@ bool LCD_flag = FALSE;
 
 float VDDA;
 
+
+
+
+void GPIO_set_AF1_PA6(void) {
+    // We Use PA6
+
+    RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOA, ENABLE); // Enable TIM clock
+
+    GPIO_InitTypeDef GPIO_InitStructAll; // Define typedef struct for setting pins
+    GPIO_StructInit(&GPIO_InitStructAll); // Initialize GPIO struct
+
+    // Then set things that are not default.
+    GPIO_InitStructAll.GPIO_Mode = GPIO_Mode_AF;
+    GPIO_InitStructAll.GPIO_Pin = GPIO_Pin_6;
+    GPIO_InitStructAll.GPIO_PuPd = GPIO_PuPd_NOPULL;
+    GPIO_InitStructAll.GPIO_Speed = GPIO_Speed_50MHz;
+
+    GPIO_Init(GPIOA, &GPIO_InitStructAll);
+    GPIO_PinAFConfig(GPIOA, GPIO_PinSource6, GPIO_AF_1); // TIM16
+
+}
+
+
+void TIM16_PWM_init(uint8_t duty) {
+
+    duty = (duty/100.0)*255;
+    printf("\nDuty = %d",duty);
+
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM16, ENABLE);
+
+
+    // Konfigurer TIM2
+    TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStruct;
+    TIM_TimeBaseStructInit(&TIM_TimeBaseInitStruct);
+    TIM_TimeBaseInitStruct.TIM_ClockDivision = TIM_CKD_DIV1;
+    TIM_TimeBaseInitStruct.TIM_CounterMode = TIM_CounterMode_Up;
+    TIM_TimeBaseInitStruct.TIM_Period = 255;
+    TIM_TimeBaseInitStruct.TIM_Prescaler = 24;
+    TIM_TimeBaseInit(TIM16,&TIM_TimeBaseInitStruct);
+
+
+
+    TIM_OCInitTypeDef TIM_OCInitStruct;
+    TIM_OCStructInit(&TIM_OCInitStruct);
+    TIM_OCInitStruct.TIM_OCMode=TIM_OCMode_PWM1;
+    TIM_OCInitStruct.TIM_OutputState=TIM_OutputState_Enable;
+    TIM_OCInitStruct.TIM_Pulse=duty;//254
+    TIM_OCInitStruct.TIM_OCPolarity=TIM_OCPolarity_High;
+    TIM_OC1Init(TIM16, &TIM_OCInitStruct);
+    TIM_OC1PreloadConfig(TIM16,TIM_OCPreload_Enable);
+    TIM_CtrlPWMOutputs(TIM16, ENABLE);
+    TIM_Cmd(TIM16,ENABLE);
+
+    TIM_SetCompare1(TIM16,duty);
+
+}
+
+
+
 uint16_t ADC_measure_PA(uint8_t ch) {
 	ADC_RegularChannelConfig(ADC1, ch, 1, ADC_SampleTime_1Cycles5);
 	ADC_StartConversion(ADC1); 	/* Start ADC read */
@@ -344,7 +403,9 @@ void setupTIM2PWM(void) {
 
 }
 
-void setup_TIM2(void) {
+
+
+void init_TIM2(void) {
 	// Enable Timer 2 clock at 10 ms / 100 Hz
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
 
@@ -368,54 +429,54 @@ volatile static uint32_t ICValue1_old;
 volatile static uint32_t ICValue2;
 
 
-void TIM2_IRQHandler(void) {
-	__disable_irq();
-
-
-
-	// Update the time structure
-
-
-	ICValue1_old = ICValue1;
-	ICValue2 = TIM_GetCapture2(TIM2); // Duty/Width
-	ICValue1 = TIM_GetCapture1(TIM2);
-
-	//uint8_t ICValid = 1;
-
-	TIM_ClearITPendingBit(TIM2, TIM_IT_CC1);
-
-	printf("a: %d b: %d c: %d\n", ICValue1, ICValue1_old, (ICValue1 - ICValue1_old));
-	// Clear the interrupt flag
-
-	__enable_irq();
-}
-
 //void TIM2_IRQHandler(void) {
 //	__disable_irq();
+//
+//
+//
 //	// Update the time structure
 //
-//	if (TIM_GetITStatus(TIM2, TIM_IT_Update) != RESET) {
-//		if (++sw_time.hundredths == 100) {
-//			sw_time.hundredths = 0;
 //
-//			if (++sw_time.seconds == 60) {
-//				sw_time.seconds = 0;
+//	ICValue1_old = ICValue1;
+//	ICValue2 = TIM_GetCapture2(TIM2); // Duty/Width
+//	ICValue1 = TIM_GetCapture1(TIM2);
 //
-//				if (++sw_time.minutes == 60) {
-//					sw_time.minutes = 0;
+//	//uint8_t ICValid = 1;
 //
-//					if (++sw_time.hours == 100) {
-//						sw_time.hours = 0;
-//					}
-//				}
-//			}
-//		}
-//	}
+//	TIM_ClearITPendingBit(TIM2, TIM_IT_CC1);
+//
+//	printf("a: %d b: %d c: %d\n", ICValue1, ICValue1_old, (ICValue1 - ICValue1_old));
 //	// Clear the interrupt flag
-//	TIM2->SR &= ~TIM_SR_UIF;
 //
 //	__enable_irq();
 //}
+
+void TIM2_IRQHandler(void) {
+	__disable_irq();
+	// Update the time structure
+
+	if (TIM_GetITStatus(TIM2, TIM_IT_Update) != RESET) {
+		if (++sw_time.hundredths == 100) {
+			sw_time.hundredths = 0;
+
+			if (++sw_time.seconds == 60) {
+				sw_time.seconds = 0;
+
+				if (++sw_time.minutes == 60) {
+					sw_time.minutes = 0;
+
+					if (++sw_time.hours == 100) {
+						sw_time.hours = 0;
+					}
+				}
+			}
+		}
+	}
+	// Clear the interrupt flag
+	TIM2->SR &= ~TIM_SR_UIF;
+
+	__enable_irq();
+}
 
 
 
