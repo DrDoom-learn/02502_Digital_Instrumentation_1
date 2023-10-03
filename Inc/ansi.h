@@ -32,7 +32,11 @@ extern float VDDA;
 
 // PWM function
 void GPIO_set_AF1_PA6(void);
-void TIM16_PWM_init(uint8_t duty);
+void GPIO_set_AF1_PB11(void);
+void timer16_clock_init(void);
+void timer2_clock_init(void);
+void TIM16_PWM_init(uint16_t duty);
+void TIM2_PWM_init(uint16_t duty);
 
 
 
@@ -40,6 +44,7 @@ void TIM16_PWM_init(uint8_t duty);
 void ADC_setup_PA(void);
 void ADC_CAL(void);
 uint16_t ADC_measure_PA(uint8_t ch);
+
 
 int16_t power(int16_t a, int16_t exp);
 void init_Joystick(void);

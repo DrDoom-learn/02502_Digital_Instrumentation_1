@@ -12,60 +12,110 @@ float VDDA;
 
 
 
-
+// Exercise 3.1
 void GPIO_set_AF1_PA6(void) {
-    // We Use PA6
+    RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOA, ENABLE);
 
-    RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOA, ENABLE); // Enable TIM clock
+    GPIO_InitTypeDef GPIO_InitStruct;
+    GPIO_StructInit(&GPIO_InitStruct);
+    GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF; // Alternating Function mode
+    GPIO_InitStruct.GPIO_Pin = GPIO_Pin_6; // Use pin 6
+    GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL; // NOPULL
+    GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_Init(GPIOA, &GPIO_InitStruct);
+    GPIO_PinAFConfig(GPIOA, GPIO_PinSource6, GPIO_AF_1); // page 242
+}
 
-    GPIO_InitTypeDef GPIO_InitStructAll; // Define typedef struct for setting pins
-    GPIO_StructInit(&GPIO_InitStructAll); // Initialize GPIO struct
+// Function to configure PA12 for PWM output using TIM16
+void GPIO_set_AF1_PB11(void) {
+    RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOB, ENABLE);
 
-    // Then set things that are not default.
-    GPIO_InitStructAll.GPIO_Mode = GPIO_Mode_AF;
-    GPIO_InitStructAll.GPIO_Pin = GPIO_Pin_6;
-    GPIO_InitStructAll.GPIO_PuPd = GPIO_PuPd_NOPULL;
-    GPIO_InitStructAll.GPIO_Speed = GPIO_Speed_50MHz;
-
-    GPIO_Init(GPIOA, &GPIO_InitStructAll);
-    GPIO_PinAFConfig(GPIOA, GPIO_PinSource6, GPIO_AF_1); // TIM16
-
+    GPIO_InitTypeDef GPIO_InitStruct;
+    GPIO_StructInit(&GPIO_InitStruct);
+    GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF; // Alternating Function mode
+    GPIO_InitStruct.GPIO_Pin = GPIO_Pin_11; // Use pin 12
+    GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL; // NOPULL
+    GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_Init(GPIOB, &GPIO_InitStruct);
+    GPIO_PinAFConfig(GPIOB, GPIO_PinSource11, GPIO_AF_1); // page 242
 }
 
 
-void TIM16_PWM_init(uint8_t duty) {
 
-    duty = (duty/100.0)*255;
-    printf("\nDuty = %d",duty);
 
+// Exercise 3.1
+void timer16_clock_init(void) {
+	// For timer 16
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM16, ENABLE);
-
-
-    // Konfigurer TIM2
+    // Configure TIM16
     TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStruct;
     TIM_TimeBaseStructInit(&TIM_TimeBaseInitStruct);
+    // Then set things that are not default.
     TIM_TimeBaseInitStruct.TIM_ClockDivision = TIM_CKD_DIV1;
     TIM_TimeBaseInitStruct.TIM_CounterMode = TIM_CounterMode_Up;
-    TIM_TimeBaseInitStruct.TIM_Period = 255;
-    TIM_TimeBaseInitStruct.TIM_Prescaler = 24;
+    TIM_TimeBaseInitStruct.TIM_Period = 4095;		// 255 in ex3.1 ------- Exercise 3.3 4095 = 12bit
+    TIM_TimeBaseInitStruct.TIM_Prescaler = 350;		// 24 in ex3.1 -------- Exercise 3.3 350
     TIM_TimeBaseInit(TIM16,&TIM_TimeBaseInitStruct);
+}
 
 
+void timer2_clock_init(void) {
+	// For timer 16
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
+    // Configure TIM16
+    TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStruct;
+    TIM_TimeBaseStructInit(&TIM_TimeBaseInitStruct);
+    // Then set things that are not default.
+    TIM_TimeBaseInitStruct.TIM_ClockDivision = TIM_CKD_DIV1;
+    TIM_TimeBaseInitStruct.TIM_CounterMode = TIM_CounterMode_Up;
+    TIM_TimeBaseInitStruct.TIM_Period = 4095;		// 255 in ex3.1 ------- Exercise 3.3 4095 = 12bit
+    TIM_TimeBaseInitStruct.TIM_Prescaler = 350;		// 24 in ex3.1 -------- Exercise 3.3 350
+    TIM_TimeBaseInit(TIM2,&TIM_TimeBaseInitStruct);
+}
+
+
+void TIM16_PWM_init(uint16_t duty) {
+
+//	printf("\nDuty = %d",duty);
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM16, ENABLE);
 
     TIM_OCInitTypeDef TIM_OCInitStruct;
     TIM_OCStructInit(&TIM_OCInitStruct);
     TIM_OCInitStruct.TIM_OCMode=TIM_OCMode_PWM1;
     TIM_OCInitStruct.TIM_OutputState=TIM_OutputState_Enable;
-    TIM_OCInitStruct.TIM_Pulse=duty;//254
-    TIM_OCInitStruct.TIM_OCPolarity=TIM_OCPolarity_High;
-    TIM_OC1Init(TIM16, &TIM_OCInitStruct);
-    TIM_OC1PreloadConfig(TIM16,TIM_OCPreload_Enable);
+    TIM_OCInitStruct.TIM_Pulse=duty; //254
+	TIM_OCInitStruct.TIM_OCPolarity = TIM_OCPolarity_High;
+	TIM_OC1Init(TIM16, &TIM_OCInitStruct);
+	TIM_OC1PreloadConfig(TIM16, TIM_OCPreload_Enable);
+
     TIM_CtrlPWMOutputs(TIM16, ENABLE);
     TIM_Cmd(TIM16,ENABLE);
 
     TIM_SetCompare1(TIM16,duty);
 
 }
+
+
+void TIM2_PWM_init(uint16_t duty) {
+
+//	printf("\nDuty = %d",duty);
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
+
+    TIM_OCInitTypeDef TIM_OCInitStruct;
+    TIM_OCStructInit(&TIM_OCInitStruct);
+    TIM_OCInitStruct.TIM_OCMode=TIM_OCMode_PWM1;
+    TIM_OCInitStruct.TIM_OutputState=TIM_OutputState_Enable;
+    TIM_OCInitStruct.TIM_Pulse=duty; //254
+    TIM_OCInitStruct.TIM_OCPolarity=TIM_OCPolarity_High;
+    TIM_OC4Init(TIM2, &TIM_OCInitStruct);
+    TIM_OC4PreloadConfig(TIM2,TIM_OCPreload_Enable);
+
+    TIM_CtrlPWMOutputs(TIM2, ENABLE);
+    TIM_Cmd(TIM2,ENABLE);
+
+    TIM_SetCompare4(TIM2,duty);
+}
+
 
 
 
@@ -103,7 +153,10 @@ void ADC_CAL(void) {
 	VDDA = 3.3f * ((float)VREFINT_CAL / (float)VREFINT_DATA);
 }
 
+
+
 void ADC_setup_PA(void) {
+	__disable_irq(); //Disable global interrupts.
 	RCC_ADCCLKConfig(RCC_ADC12PLLCLK_Div8);
 	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_ADC12, ENABLE);
 	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOA, ENABLE);
@@ -118,6 +171,8 @@ void ADC_setup_PA(void) {
 	GPIO_Init(GPIOA, &GPIO_InitStructAll);
 	GPIO_InitStructAll.GPIO_Pin = GPIO_Pin_1; // Set so the configuration is on pin 1
 	GPIO_Init(GPIOA, &GPIO_InitStructAll);
+	GPIO_InitStructAll.GPIO_Pin = GPIO_Pin_4; // Set so the configuration is on pin 4
+	GPIO_Init(GPIOA, &GPIO_InitStructAll);
 
 	// See RM [p.47]
 	ADC_InitTypeDef ADC_InitStruct;
@@ -130,30 +185,22 @@ void ADC_setup_PA(void) {
 
 	ADC_Cmd(ADC1, ENABLE);
 	while (!ADC_GetFlagStatus(ADC1, ADC_FLAG_RDY)) {}
-
 	ADC_VoltageRegulatorCmd(ADC1, ENABLE); //Wait for at least 10uS before continuing...
 	// set internal reference voltage source and wait
 
 	for (uint32_t i = 0; i < 10000; i++);
 
 	ADC_Cmd(ADC1, DISABLE);
-
 	while (ADC_GetDisableCmdStatus(ADC1)) {} // wait for disable of ADC
-
 	ADC_SelectCalibrationMode(ADC1, ADC_CalibrationMode_Single);
 
 	ADC_StartCalibration(ADC1);
-
 	while (ADC_GetCalibrationStatus(ADC1)) {}
-
 	for (uint32_t i = 0; i < 100; i++);
 
 	ADC_Cmd(ADC1, ENABLE);
-
+	__enable_irq(); // Enable interrupts again
 }
-
-
-
 
 
 

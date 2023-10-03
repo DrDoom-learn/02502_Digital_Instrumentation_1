@@ -30,12 +30,17 @@ void init(void) {
 	//initJoystick();
 	//initLed();
 	//setLed(off);
-	init_Interrupt();
+	//init_Interrupt();
 	//init_TIM2();
 	//setup_TIM15();
-	init_spi_lcd();
-	//ADC_setup_PA();
+	//init_spi_lcd();
+	ADC_setup_PA();
 	//ADC_CAL();
+	GPIO_set_AF1_PA6();
+	GPIO_set_AF1_PB11();
+	timer16_clock_init();
+	timer2_clock_init();
+
 	__enable_irq();	//Enable global interrupts.
 }
 
@@ -43,38 +48,42 @@ void init(void) {
 int main(void) {
 
 	init();
-TIM_Cmd(TIM2, ENABLE);
+
+
+
+//	// Exercise 3.2
+//	TIM16_PWM_init(127);
+
+
+
+//	TIM16_PWM_init(70);
+//	TIM2_PWM_init(200);
+
 
 	while (1) {
 
-
-/* STOPWATCH EXERCISE  Exercise 1.4   */
+		/* STOPWATCH EXERCISE  Exercise 1.4   */
 //		sprintf(str2, "Time since start: %02d %02d %02d\n Split time 1: %02d %02d %02d \n  ", sw_time.hours, sw_time.minutes, sw_time.seconds, sw_split.hours, sw_split.minutes, sw_split.seconds);
 //				if (sw_time.seconds != last_second) {
 //					printf(str2);
 //					last_second = sw_time.seconds;
 //				}
 
-/* OPG 2.1  */
-				uint8_t fbuffer[512];
-				memset(fbuffer,0x0A,512); // Sets each element of the buffer to 0xAA
-			    //uint8_t fbuffer[512] = {0x7F, 0x31, 0x34, 0x3C, 0x34, 0x30, 0x78, 0x00};
-			    lcd_push_buffer(fbuffer);
-	}
 
-
-
-
-
-	//        OPG 2.2
-
+		/* OPG 2.1  */
+//		uint8_t fbuffer[512];
+//		memset(fbuffer,0x0A,512); // Sets each element of the buffer to 0xAA
+//		//uint8_t fbuffer[512] = {0x7F, 0x31, 0x34, 0x3C, 0x34, 0x30, 0x78, 0x00};
+//		lcd_push_buffer(fbuffer);
+//
+//
+//        OPG 2.2
 //	    uint8_t fbuffer[512] = {0};
 //	    lcd_write_string("1. line - indented", fbuffer, 10, 0);
 //	    lcd_write_string("2. line", fbuffer, 0, 1);
 //	    lcd_write_string("3. line - indented", fbuffer, 30, 1);
 //	    lcd_write_string("4. line", fbuffer, 0, 3);
 //	    lcd_push_buffer(fbuffer);
-
 //	    uint8_t printout[512] = {0};
 //	    uint8_t a = 10;
 //	    char str_test[7] = {0};
@@ -83,43 +92,82 @@ TIM_Cmd(TIM2, ENABLE);
 //	    lcd_push_buffer(printout);
 
 
-	//TODO Lav nedenstående til funktioner
-	//		OPG 2.3
+		//TODO Lav nedenstående til funktioner
+//		OPG 2.3
+//		uint32_t address = 0x0800F800;
+//		uint16_t data[10] = {16, 0xA1 , 0xA2 , 0xA3, 0xA4, 0xA5, 0xA6, 0xA7, 0xA8, 0xA9};
+//
+//		FLASH_Unlock(); FLASH_ClearFlag(FLASH_FLAG_EOP | FLASH_FLAG_PGERR | FLASH_FLAG_WRPERR);
+//		FLASH_ErasePage( address ); for ( int i = 0; i < 10; i++ )
+//		{ FLASH_ProgramHalfWord(address + i * 2, data[i]); }
+//		FLASH_Lock();
+//
+//		address = 0x0800F800;
+//		uint16_t tempVal;
+//		for ( int i = 0 ; i < 10 ; i++ ){
+//			tempVal = *(uint16_t *) (address + i * 2); // Read Command
+//			printf("%d \n", tempVal); }
+//		float tempfloat = 2.5;
+//		uint32_t tempval32 = 1500;
+//		uint16_t tempval16 = 120;
+//
+//
+//		init_page_flash(PG31_BASE);
+//		FLASH_Unlock();
+//		for ( int i = 0; i < 10 ; i++) {
+//		write_float_flash(PG31_BASE, 0x00+i, tempfloat+0.1*i);
+//		write_word_flash(PG31_BASE, 0x10+i, tempval32+i);
+//		//write_hword_flash(PG31_BASE, 0x20+i, tempval16+i);
+//		}
+//		FLASH_Lock();
+//
+//
+//		for (int i = 0; i < 0 ; i++) {
+//			volatile float tempfloatout = read_float_flash(PG31_BASE, 0x00+i);
+//			volatile uint32_t tempval32out = read_word_flash(PG31_BASE, 0x10+i);
+//			printf("tempfloat: %f \n tempval32: %ld \n", tempfloatout, tempval32out);
+//		}
 
-//	uint32_t address = 0x0800F800;
-//	uint16_t data[10] = {16, 0xA1 , 0xA2 , 0xA3, 0xA4, 0xA5, 0xA6, 0xA7, 0xA8, 0xA9};
-//
-//	FLASH_Unlock(); FLASH_ClearFlag(FLASH_FLAG_EOP | FLASH_FLAG_PGERR | FLASH_FLAG_WRPERR);
-//	FLASH_ErasePage( address ); for ( int i = 0; i < 10; i++ )
-//	{ FLASH_ProgramHalfWord(address + i * 2, data[i]); }
-//	FLASH_Lock();
-//
-//	address = 0x0800F800;
-//	uint16_t tempVal;
-//	for ( int i = 0 ; i < 10 ; i++ ){
-//		tempVal = *(uint16_t *) (address + i * 2); // Read Command
-//		printf("%d \n", tempVal); }
 
-//	float tempfloat = 2.5;
-//	uint32_t tempval32 = 1500;
-//	uint16_t tempval16 = 120;
-//
-//
-//	init_page_flash(PG31_BASE);
-//	FLASH_Unlock();
-//	for ( int i = 0; i < 10 ; i++) {
-//	write_float_flash(PG31_BASE, 0x00+i, tempfloat+0.1*i);
-//	write_word_flash(PG31_BASE, 0x10+i, tempval32+i);
-//	//write_hword_flash(PG31_BASE, 0x20+i, tempval16+i);
-//	}
-//	FLASH_Lock();
-//
-//
-//	for (int i = 0; i < 0 ; i++) {
-//	volatile float tempfloatout = read_float_flash(PG31_BASE, 0x00+i);
-//	volatile uint32_t tempval32out = read_word_flash(PG31_BASE, 0x10+i);
-//	printf("tempfloat: %f \n tempval32: %ld \n", tempfloatout, tempval32out);
-//	}
+
+
+
+
+ 		// Exercise 3.2
+//		uint16_t pot1_val = ADC_measure_PA(1);
+//		uint16_t servo1_position = (pot1_val * 100) / 4095;
+
+
+//		float adc_val = (ADC_measure_PA(4)); // Convertion to Volt
+//		char str[512] = {0};
+//		uint8_t printout[512] = {0};
+//		printf("\nADC_measure = %.2f", adc_val);
+//		sprintf(str, "ADC = %.2f V", adc_val);
+//		lcd_write_string(str, printout, 0, 0);
+//		lcd_push_buffer(printout);
+
+
+
+
+		// Exercise 3.3
+		uint16_t duty_pot1 = (ADC_measure_PA(2) * 0.1) + 50;	// limiting the servo to do the on period from 1-2ms
+		TIM16_PWM_init(duty_pot1);
+		uint16_t duty_pot2 = (ADC_measure_PA(1) * 0.1) + 50;	// limiting the servo to do the on period from 1-2ms
+		TIM2_PWM_init(duty_pot2);
+
+
+
+
+
+
+
+	}
+
+
+
+
+
+
 
 }
 
